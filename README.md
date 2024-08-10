@@ -7,9 +7,9 @@ BruteForge is a python-based tool designed for generating brute-force wordlists.
 
 # Features
 
-* Supports multiple predefined character sets.
+* Multiple predefined character sets.
 
-* Custom character set support.
+* Supports custom character sets.
 
 * Generates combinations of specified lengths.
 
@@ -20,12 +20,17 @@ BruteForge is a python-based tool designed for generating brute-force wordlists.
 
 To use BruteForge, ensure you have Python 3 installed on your system.
  
- `git clone https://github.com/Cyber-Anonymous/BruteForge`
+ `git clone https://github.com/Cyber-Anonymous/BruteForge.git`
  
  `cd BruteForge`
  
  `python3 bruteforge.py -h`
+
+ ### Interactive Mode
+
+  `python3 bruteforge.py`
  
+
  # Usage
  
  ```bash
@@ -48,6 +53,11 @@ options:
   --version             show program's version number and exit
 
  ```
+
+ ## Example
+ 
+ `python3 bruteforge.py -l 4 -o wordlist.txt`
+
  
 ## BruteForge
  ![](images/image.png)

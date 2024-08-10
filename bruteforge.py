@@ -1,4 +1,7 @@
 #!/usr/bin/env python3
+
+Tool_Name = "BruteForge"
+Version = "1.1.0"
 """
 Author: Sajjad
 GitHub: https://github.com/Cyber-Anonymous
@@ -12,8 +15,6 @@ import time
 import os
 import math
 
-Tool_Name = "BruteForge"
-Version = "1.0.0"
 
 charsets = {
     "digits": string.digits,
@@ -38,9 +39,10 @@ args = parser.parse_args()
 
 charset = charsets["all"]
 
+start_time = time.time()
 
 def banner():
-    print("\033[0;94m")
+    print("\033[1;94m")
     print("""
     ____             __       ______                    
    / __ )_______  __/ /____  / ____/___  _________ ____ 
@@ -137,21 +139,30 @@ def convert_size(size_bytes):
     
     return "{} {}".format(s, size_name[i])
 
+def print_progress_bar(count, total):
+    bar_length = 40
+    progress = count / total
+    percent = progress * 100
+    arrow = "#" * int(round(progress * bar_length))
+    spaces = " " * (bar_length - len(arrow))
+    sys.stdout.write("\r[{}{}] {}/{} ({:.2f}%)".format(arrow, spaces, count, total, percent))
+    sys.stdout.flush()
 
 try:
-    start_time = time.time()
+    if args.verbose:
+        print("Process started at {}\n".format(time.ctime(start_time)))
     total_combination = len(charset) ** length
     count = 0
     for combination in itertools.product(charset, repeat=length):
         password = "".join(combination)
         file.write(password + "\n")
         count += 1
-        if args.verbose and count % 1 == 0:
-            elapsed_time = int(time.time() - start_time)
+        if bool(args.verbose) == False:
+            print_progress_bar(count, total_combination)
+        if args.verbose:
             progress = (count / total_combination) * 100
             sys.stdout.write("\r[INFO] Progress: {:.2f}%".format(progress))
             sys.stdout.write(" | Password: {}".format(password))
-            sys.stdout.write(" | Elapsed Time: {}s".format(elapsed_time))
             sys.stdout.flush()
         else:
             pass
@@ -159,23 +170,19 @@ try:
     os.fsync(file.fileno())
     file.close()
 
-    if args.verbose:
-        print("")
+    print("")
     file_size = os.path.getsize(filename)
     print("\nGenerated {} combinations.".format(count))
+    end_time = time.time()
+    if args.verbose:
+        elapsed = end_time - start_time
+        elapsed_time = time.strftime("%H:%M:%S", time.gmtime(elapsed))
+        print("Elapsed Time: {}".format(elapsed_time))
     print("Total data generated: {} bytes ({})".format(file_size, convert_size(file_size)))
-
-    print("\nBrute-force list generated and saved to {}\n".format(args.output))
+    if args.verbose:
+        print("\nProcess ended at {}".format(time.ctime(end_time)))
+    print("\nBrute-force list generated and saved to {}\n".format(filename))
 
 except Exception as error:
     print("\033[0;91m[ERROR] {}\033[0m]".format(error))
     sys.exit()
-
-
-
-
-
-
-
-
-
