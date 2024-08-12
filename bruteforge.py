@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 Tool_Name = "BruteForge"
-Version = "1.1.0"
+Version = "1.2.0"
 """
 Author: Sajjad
 GitHub: https://github.com/Cyber-Anonymous
@@ -28,11 +28,12 @@ charsets = {
 
 parser = argparse.ArgumentParser(description="Generate a brute-force wordlist.")
 
-parser.add_argument("-l", "--length", type=int, help="Length of each combination.")
-parser.add_argument("-c", "--charset", choices=["digits", "lowercase", "uppercase", "special", "all"], help="Character set to use: digits, lowercase, uppercase, special, all")
-parser.add_argument("-s", "--custom_charset", type=str, help="Custom character set to use.")
+parser.add_argument("-m", "--min_length", type=int, help="Minimum combination length.")
+parser.add_argument("-M", "--max_length", type=int, help="Maximum combination length.")
+parser.add_argument("-c", "--charset", choices=["digits", "lowercase", "uppercase", "special", "all"], help="Character set to use.")
+parser.add_argument("-s", "--custom_charset", type=str, help="Custom character set.")
 parser.add_argument("-o", "--output", type=str, help="Output file name.")
-parser.add_argument("-v", "--verbose", action="store_true", help="Print progress information.")
+parser.add_argument("-v", "--verbose", action="store_true", help="Display progress information.")
 parser.add_argument("--version", action="version", version="{} {}".format(Tool_Name, Version))
 
 args = parser.parse_args()
@@ -55,18 +56,33 @@ def banner():
     print("\033[0;0m")
 
 
-if(bool(args.length) == True):
-    length = args.length
+if(bool(args.min_length) == True):
+    min_length = args.min_length
 
-elif(bool(args.length) == False):
+elif(bool(args.min_length) == False):
     banner()
     while(True):
-        length = input("Length of each combination > ")
+        min_length = input("Minimum length > ")
         try:
-            length = int(length)
+            min_length = int(min_length)
             break
         except:
-            print("\033[0;91mInvalid length.\033[0;00m\n")
+            print("\033[0;91mInvalid minimum length.\033[0;00m\n")
+else:
+    pass
+
+
+if(bool(args.max_length) == True):
+    max_length = args.max_length
+
+elif(bool(args.max_length) == False):
+    while(True):
+        max_length = input("Maximum length > ")
+        try:
+            max_length = int(max_length)
+            break
+        except:
+            print("\033[0;91mInvalid maximum length.\033[0;00m\n")
 
 else:
     pass
@@ -151,21 +167,27 @@ def print_progress_bar(count, total):
 try:
     if args.verbose:
         print("Process started at {}\n".format(time.ctime(start_time)))
-    total_combination = len(charset) ** length
+    total_combination = 0
     count = 0
-    for combination in itertools.product(charset, repeat=length):
-        password = "".join(combination)
-        file.write(password + "\n")
-        count += 1
-        if bool(args.verbose) == False:
-            print_progress_bar(count, total_combination)
-        if args.verbose:
-            progress = (count / total_combination) * 100
-            sys.stdout.write("\r[INFO] Progress: {:.2f}%".format(progress))
-            sys.stdout.write(" | Password: {}".format(password))
-            sys.stdout.flush()
-        else:
-            pass
+
+    for length in range(min_length, max_length +1):
+        comb_per_length = len(charset) ** length
+        total_combination += comb_per_length
+
+    for length in range(min_length, max_length +1):
+        for combination in itertools.product(charset, repeat=length):
+            password = "".join(combination)
+            file.write(password + "\n")
+            count += 1
+            if bool(args.verbose) == False:
+                print_progress_bar(count, total_combination)
+            if args.verbose:
+                progress = (count / total_combination) * 100
+                sys.stdout.write("\r[INFO] Progress: {:.2f}%".format(progress))
+                sys.stdout.write(" | Password: {}".format(password))
+                sys.stdout.flush()
+            else:
+                pass
     file.flush()
     os.fsync(file.fileno())
     file.close()
